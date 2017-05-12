@@ -1,4 +1,4 @@
-/*
+﻿/*
 * gmisc.c: Misc functions with no place to go (right now)
 *
 * Author:
@@ -25,51 +25,22 @@
 * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
+#ifdef PLATFORM_UNITY
 
 #include <stdlib.h>
 #include <glib.h>
 
-#if defined(PLATFORM_UNITY)
+#include "Path-c-api.h"
 
-const gchar *
-g_getenv(const gchar *variable)
-{
-
-}
-
-gboolean
-g_setenv(const gchar *variable, const gchar *value, gboolean overwrite)
-{
-}
-
-void
-g_unsetenv(const gchar *variable)
-{
-}
-
-gchar*
-g_win32_getlocale(void)
-{
-}
-
-gboolean
-g_path_is_absolute(const char *filename)
-{
-}
-
-const gchar *
-g_get_home_dir(void)
-{
-}
-
-const char *
-g_get_user_name(void)
-{
-}
+static const char *tmp_dir;
 
 const gchar *
 g_get_tmp_dir(void)
 {
+    if (tmp_dir == NULL)
+        tmp_dir = UnityPalGetTempPath();
+
+    return tmp_dir;
 }
 
 #endif // PLATFORM_UNITY
