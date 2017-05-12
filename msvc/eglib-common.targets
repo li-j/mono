@@ -24,6 +24,7 @@
         <ClCompile Include="$(MonoSourceLocation)\eglib\src\gstring.c" />
         <ClCompile Include="$(MonoSourceLocation)\eglib\src\gunicode.c" />
         <ClCompile Include="$(MonoSourceLocation)\eglib\src\gutf8.c" />
+        <ClCompile Include="$(MonoSourceLocation)\eglib\src\gpath.c" />
       </ItemGroup>
       <ItemGroup>
         <ClInclude Include="$(MonoSourceLocation)\eglib\src\glib.h" />

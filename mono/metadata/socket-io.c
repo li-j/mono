@@ -2320,7 +2320,7 @@ ves_icall_System_Net_Sockets_Socket_SetSocketOption_internal (SOCKET sock, gint3
 		{
 			MonoObject *address = NULL;
 
-#if defined (PLATFORM_UNTY_USPPORTS_IPV6)
+#if defined (PLATFORM_UNTY_SUPPORTS_IPV6)
 			if (system_level == sol_ipv6) {
 				struct ipv6_mreq mreq6;
 
