@@ -668,6 +668,8 @@ mono_gc_alloc_obj (MonoVTable *vtable, size_t size)
 	if (G_UNLIKELY (mono_profiler_events & MONO_PROFILE_ALLOCATIONS))
 		mono_profiler_allocation (obj);
 
+	gc_stats.new_object_count++;
+
 	return obj;
 }
 
@@ -701,6 +703,8 @@ mono_gc_alloc_vector (MonoVTable *vtable, size_t size, uintptr_t max_length)
 
 	if (G_UNLIKELY (mono_profiler_events & MONO_PROFILE_ALLOCATIONS))
 		mono_profiler_allocation (&obj->obj);
+
+	gc_stats.new_object_count++;
 
 	return obj;
 }
@@ -739,6 +743,8 @@ mono_gc_alloc_array (MonoVTable *vtable, size_t size, uintptr_t max_length, uint
 	if (G_UNLIKELY (mono_profiler_events & MONO_PROFILE_ALLOCATIONS))
 		mono_profiler_allocation (&obj->obj);
 
+	gc_stats.new_object_count++;
+
 	return obj;
 }
 
@@ -756,6 +762,8 @@ mono_gc_alloc_string (MonoVTable *vtable, size_t size, gint32 len)
 
 	if (G_UNLIKELY (mono_profiler_events & MONO_PROFILE_ALLOCATIONS))
 		mono_profiler_allocation (&obj->object);
+
+	gc_stats.new_object_count++;
 
 	return obj;
 }
@@ -1438,6 +1446,8 @@ BOOL APIENTRY mono_gc_dllmain (HMODULE module_handle, DWORD reason, LPVOID reser
 {
 #if !HAVE_BDWGC_GC
 	return GC_DllMain (module_handle, reason, reserved);
+#else
+	return TRUE;
 #endif
 }
 #endif

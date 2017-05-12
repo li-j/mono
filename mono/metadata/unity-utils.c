@@ -596,7 +596,7 @@ guint64 mono_unity_type_get_hash(MonoType *type, gboolean inflate)
     GList *hashes = monoeg_g_list_alloc();
 
     get_type_hashes(type, hashes, inflate);
-
+    
     guint64 hash = 0;
 
     g_list_first(hashes);
@@ -988,7 +988,7 @@ MONO_API MonoArray*
 mono_unity_array_new_3d (MonoDomain *domain, MonoClass *eklass, size_t size0, size_t size1, size_t size2)
 {
 	MonoError error;
-	uintptr_t sizes[] = { (uintptr_t)size0, (uintptr_t)size1, (uintptr_t)size1 };
+	uintptr_t sizes[] = { (uintptr_t)size0, (uintptr_t)size1, (uintptr_t)size2 };
 	MonoClass* ac = mono_array_class_get (eklass, 3);
 
 	MonoArray* array =  mono_array_new_full_checked (domain, ac, sizes, NULL, &error);
@@ -1020,27 +1020,4 @@ MONO_API void
 mono_unity_install_memory_callbacks (MonoAllocatorVTable* callbacks)
 {
 	mono_set_allocator_vtable (callbacks);
-}
-
-static char* data_dir = NULL;
-MONO_API void
-mono_unity_set_data_dir(const char* dir)
-{
-    if (data_dir)
-        g_free(data_dir);
-
-    data_dir = g_new(char*, strlen(dir) + 1);
-    strcpy(data_dir, dir);
-}
-
-MONO_API char*
-mono_unity_get_data_dir()
-{
-    return data_dir;
-}
-
-MONO_API gpointer
-mono_unity_alloc(gsize size)
-{
-    return g_malloc(size);
 }
