@@ -20,16 +20,19 @@
   </ItemGroup>
   <Import Project="libmonoruntime-common.targets" />
   <ItemGroup>
-    <ClCompile Include="..\mono\metadata\boehm-gc.c" />
-    <ClCompile Include="..\mono\metadata\console-win32.c" />
-    <ClCompile Include="..\mono\metadata\mono-security.c" />
-    <ClCompile Include="..\mono\metadata\sgen-os-mach.c">
+    <ClCompile Include="$(MonoSourceLocation)\mono\metadata\boehm-gc.c" />
+    <ClCompile Include="$(MonoSourceLocation)\mono\metadata\console-win32.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ORBIS'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ORBIS'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="$(MonoSourceLocation)\mono\metadata\mono-security.c" />
+    <ClCompile Include="$(MonoSourceLocation)\mono\metadata\sgen-os-mach.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="..\mono\metadata\sgen-os-posix.c">
+    <ClCompile Include="$(MonoSourceLocation)\mono\metadata\sgen-os-posix.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
