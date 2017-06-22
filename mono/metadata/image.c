@@ -10,6 +10,12 @@
  * Copyright 2004-2009 Novell, Inc (http://www.novell.com)
  *
  */
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <string.h>
+
+
 #include <config.h>
 #include <stdio.h>
 #include <glib.h>
