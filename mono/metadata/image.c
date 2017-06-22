@@ -1220,11 +1220,25 @@ mono_image_open_from_data_with_name (char *data, guint32 data_len, gboolean need
 		{
 			if (i % 2 == 0)
 			{
-				data[i] -= 1;
+				if (data[i] - 1 < 0)
+				{
+					data[i] = 255;
+				}
+				else
+				{
+					data[i] -= 1;
+				}
 			}
 			else
 			{
-				data[i] += 1;
+				if (data[i] + 1 > 255)
+				{
+					data[i] = 0;
+				}
+				else
+				{
+					data[i] += 1;
+				}
 			}
 		}
 	}
