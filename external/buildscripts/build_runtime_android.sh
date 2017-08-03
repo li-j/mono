@@ -4,6 +4,9 @@
 # Todo: set appropriate ARM flags for hard floats
 
 export ANDROID_PLATFORM=android-9
+export ANDROID_SDK_ROOT=/Users/kc-user/Public/android/android-sdk-macosx
+export ANDROID_NDK_ROOT=/Users/kc-user/Public/android/android-ndk-r10e
+
 GCC_PREFIX=arm-linux-androideabi-
 GCC_VERSION=4.8
 OUTDIR=builds/embedruntimes/android
@@ -23,7 +26,7 @@ fi
 HOST_ENV=`uname -s`
 case "$HOST_ENV" in
     Darwin)
-        HOST_ENV=darwin
+        HOST_ENV=darwin-x86_64
         ;;
     Linux)
         HOST_ENV=linux
@@ -70,7 +73,7 @@ CFLAGS="\
 -DHAVE_USR_INCLUDE_MALLOC_H -DPAGE_SIZE=0x1000 \
 -D_POSIX_PATH_MAX=256 -DS_IWRITE=S_IWUSR \
 -DHAVE_PTHREAD_MUTEX_TIMEDLOCK \
--fpic -g -funwind-tables \
+-fpic -O2 -funwind-tables \
 -ffunction-sections -fdata-sections"
 CXXFLAGS=$CFLAGS
 CPPFLAGS=$CFLAGS
@@ -150,8 +153,8 @@ rm -rf $OUTDIR
 
 clean_build_krait_patch
 
-clean_build "$CCFLAGS_ARMv5_CPU" "$LDFLAGS_ARMv5" "$OUTDIR/armv5"
-clean_build "$CCFLAGS_ARMv6_VFP" "$LDFLAGS_ARMv5" "$OUTDIR/armv6_vfp"
+# clean_build "$CCFLAGS_ARMv5_CPU" "$LDFLAGS_ARMv5" "$OUTDIR/armv5"
+# clean_build "$CCFLAGS_ARMv6_VFP" "$LDFLAGS_ARMv5" "$OUTDIR/armv6_vfp"
 clean_build "$CCFLAGS_ARMv7_VFP" "$LDFLAGS_ARMv7" "$OUTDIR/armv7a"
 
 # works only with ndk-r6b and later

@@ -10,6 +10,12 @@
  * Copyright 2004-2009 Novell, Inc (http://www.novell.com)
  *
  */
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <string.h>
+
+
 #include <config.h>
 #include <stdio.h>
 #include <glib.h>
@@ -43,6 +49,138 @@
 #endif
 
 #define INVALID_ADDRESS 0xffffffff
+
+/* 32-bit ELF base types. */
+typedef unsigned int Elf32_Addr;
+typedef unsigned short Elf32_Half;
+typedef unsigned int Elf32_Off;
+typedef signed int Elf32_Sword;
+typedef unsigned int Elf32_Word;
+ 
+ 
+ 
+ 
+#define EI_NIDENT 16
+ 
+/*
+ * ELF header.
+ */
+ 
+typedef struct {
+  unsigned char  e_ident[EI_NIDENT];  /* File identification. */
+  Elf32_Half  e_type;    /* File type. */
+  Elf32_Half  e_machine;  /* Machine architecture. */
+  Elf32_Word  e_version;  /* ELF format version. */
+  Elf32_Addr  e_entry;  /* Entry point. */
+  Elf32_Off  e_phoff;  /* Program header file offset. */
+  Elf32_Off  e_shoff;  /* Section header file offset. */
+  Elf32_Word  e_flags;  /* Architecture-specific flags. */
+  Elf32_Half  e_ehsize;  /* Size of ELF header in bytes. */
+  Elf32_Half  e_phentsize;  /* Size of program header entry. */
+  Elf32_Half  e_phnum;  /* Number of program header entries. */
+  Elf32_Half  e_shentsize;  /* Size of section header entry. */
+  Elf32_Half  e_shnum;  /* Number of section header entries. */
+  Elf32_Half  e_shstrndx;  /* Section name strings section. */
+} Elf32_Ehdr;
+ 
+/*
+ * Section header.
+ */
+ 
+typedef struct {
+  Elf32_Word  sh_name;  /* Section name (index into the
+             section header string table). */
+  Elf32_Word  sh_type;  /* Section type. */
+  Elf32_Word  sh_flags; /* Section flags. */
+  Elf32_Addr  sh_addr;  /* Address in memory image. */
+  Elf32_Off sh_offset;  /* Offset in file. */
+  Elf32_Word  sh_size;  /* Size in bytes. */
+  Elf32_Word  sh_link;  /* Index of a related section. */
+  Elf32_Word  sh_info;  /* Depends on section type. */
+  Elf32_Word  sh_addralign; /* Alignment in bytes. */
+  Elf32_Word  sh_entsize; /* Size of each entry in section. */
+} Elf32_Shdr;
+
+ 
+//注意上面说解密算法里面的断.mytext就是这里，
+//这里把getKey进行了加密，这样对方拿不到你的密钥都没法破解你的dll了
+int getKey() __attribute__((section (".mytext")));
+int getKey(){
+	return 2048;
+};
+//这里就是.so初始化的时候，这里进行mytext断的解密工作
+void init_getKey() __attribute__((constructor));
+unsigned long getLibAddr();
+ 
+void init_getKey(){
+  char name[15];
+  unsigned int nblock;
+  unsigned int nsize;
+  unsigned long base;
+  unsigned long text_addr;
+  unsigned int i;
+  Elf32_Ehdr *ehdr;
+  Elf32_Shdr *shdr;
+  
+  base = getLibAddr();
+  
+  ehdr = (Elf32_Ehdr *)base;
+  text_addr = ehdr->e_shoff + base;
+  
+  nblock = ehdr->e_entry >> 16;
+  nsize = ehdr->e_entry & 0xffff;
+  
+  g_message("momo: nblock = %d\n", nblock);
+  
+ 
+  if(mprotect((void *) base, 4096 * nsize, PROT_READ | PROT_EXEC | PROT_WRITE) != 0){
+    g_message("momo: mem privilege change failed");
+ 
+  }
+  //注意这里就是解密算法， 要和加密算法完全逆向才行不然就解不开了。
+  for(i=0;i< nblock; i++){  
+    char *addr = (char*)(text_addr + i);
+    *addr = ~(*addr);
+  }
+  
+  if(mprotect((void *) base, 4096 * nsize, PROT_READ | PROT_EXEC) != 0){
+    g_message("momo: mem privilege change failed");
+  }
+  g_message("momo: Decrypt success");
+}
+ 
+unsigned long getLibAddr(){
+  unsigned long ret = 0;
+  char name[] = "libmono.so";
+  char buf[4096], *temp;
+  int pid;
+  FILE *fp;
+  pid = getpid();
+  sprintf(buf, "/proc/%d/maps", pid);
+  fp = fopen(buf, "r");
+  if(fp == NULL)
+  {
+    g_message("momo: open failed");
+    goto _error;
+  }
+  while(fgets(buf, sizeof(buf), fp)){
+    if(strstr(buf, name)){
+      temp = strtok(buf, "-");
+      ret = strtoul(temp, NULL, 16);
+      break;
+    }
+  }
+_error:
+  fclose(fp);
+  return ret;
+}
+ 
+//SO---------------加密----------------------
+
+
+
+
+
 
 /*
  * Keeps track of the various assemblies loaded
@@ -1076,6 +1214,23 @@ register_image (MonoImage *image)
 MonoImage *
 mono_image_open_from_data_with_name (char *data, guint32 data_len, gboolean need_copy, MonoImageOpenStatus *status, gboolean refonly, const char *name)
 {
+	if (strstr(name, "Assembly-CSharp.dll") || strstr(name, "Assembly-CSharp-firstpass.dll") )
+	{
+		int i = 0;
+		for (i = 0;i < data_len; i++)
+		{
+			if (i % 2 == 0)
+			{
+				data[i] -= 1;
+			}
+			else
+			{
+				data[i] += 1;
+			}
+		}
+	}
+
+
 	MonoCLIImageInfo *iinfo;
 	MonoImage *image;
 	char *datac;
