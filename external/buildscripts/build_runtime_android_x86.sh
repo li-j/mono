@@ -8,7 +8,7 @@ export ANDROID_SDK_ROOT=/Users/kc-user/Public/android/android-sdk-macosx
 export ANDROID_NDK_ROOT=/Users/kc-user/Public/android/android-ndk-r10e
 
 GCC_PREFIX=i686-linux-android-
-GCC_VERSION=4.8
+GCC_VERSION=4.9
 OUTDIR=builds/embedruntimes/android
 PREFIX=`pwd`/builds/android
 

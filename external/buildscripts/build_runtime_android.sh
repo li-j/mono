@@ -8,13 +8,15 @@ export ANDROID_SDK_ROOT=/Users/kc-user/Public/android/android-sdk-macosx
 export ANDROID_NDK_ROOT=/Users/kc-user/Public/android/android-ndk-r10e
 
 GCC_PREFIX=arm-linux-androideabi-
-GCC_VERSION=4.8
+GCC_VERSION=4.9
 OUTDIR=builds/embedruntimes/android
 CWD="$(pwd)"
 PREFIX="$CWD/builds/android"
 BUILDSCRIPTSDIR=external/buildscripts
 
 perl ${BUILDSCRIPTSDIR}/PrepareAndroidSDK.pl -ndk=r10e -env=envsetup.sh && source envsetup.sh
+
+
 
 NDK_ROOT=`cd $ANDROID_NDK_ROOT && pwd`
 
@@ -43,6 +45,8 @@ esac
 PLATFORM_ROOT=$NDK_ROOT/platforms/$ANDROID_PLATFORM/arch-arm
 TOOLCHAIN=$NDK_ROOT/toolchains/$GCC_PREFIX$GCC_VERSION/prebuilt/$HOST_ENV
 
+echo $TOOLCHAIN
+
 if [ ! -d $TOOLCHAIN ]; then
 	TOOLCHAIN=${TOOLCHAIN}-x86
 	if [ ! -d $TOOLCHAIN ]; then
@@ -56,7 +60,7 @@ if [ ! -a $TOOLCHAIN -o ! -a $PLATFORM_ROOT ]; then
 	exit 1
 fi
 
-KRAIT_PATCH_PATH="${CWD}/../../android_krait_signal_handler/build"
+KRAIT_PATCH_PATH="${CWD}/external/android_krait_signal_handler/"
 PATH="$TOOLCHAIN/bin:$PATH"
 CC="$TOOLCHAIN/bin/${GCC_PREFIX}gcc --sysroot=$PLATFORM_ROOT"
 CXX="$TOOLCHAIN/bin/${GCC_PREFIX}g++ --sysroot=$PLATFORM_ROOT"
@@ -105,6 +109,7 @@ fi
 
 function clean_build_krait_patch
 {
+	echo $KRAIT_PATCH_PATH
        local KRAIT_PATCH_REPO="git://github.com/Unity-Technologies/krait-signal-handler.git"
        if [ ${UNITY_THISISABUILDMACHINE:+1} ]; then
                echo "Trusting TC to have cloned krait patch repository for us"
